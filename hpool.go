@@ -48,31 +48,31 @@ func (i *Hpool) SetDebug(enable bool) {
 	i.client.debug = enable
 }
 
-type PoolList struct {
+type Pool struct {
 	ApiKey                          string  `json:"api_key"`
-	BlockReward                     float64 `json:"block_reward"`
+	BlockReward                     float64 `json:"block_reward,string"`
 	BlockTime                       int     `json:"block_time"`
 	Capacity                        int     `json:"capacity"`
 	Coin                            string  `json:"coin"`
-	DepositMortgageBalance          float64 `json:"deposit_mortgage_balance"`
-	DepositMortgageEffectiveBalance float64 `json:"deposit_mortgage_effective_balance"`
-	DepositMortgageFreeBalance      float64 `json:"deposit_mortgage_free_balance"`
-	DepositRate                     float64 `json:"deposit_rate"`
+	DepositMortgageBalance          float64 `json:"deposit_mortgage_balance,string"`
+	DepositMortgageEffectiveBalance float64 `json:"deposit_mortgage_effective_balance,string"`
+	DepositMortgageFreeBalance      float64 `json:"deposit_mortgage_free_balance,string"`
+	DepositRate                     float64 `json:"deposit_rate,string"`
 	Fee                             float64 `json:"fee"`
-	LoanMortgageBalance             float64 `json:"loan_mortgage_balance"`
-	Mortgage                        float64 `json:"mortgage"`
+	LoanMortgageBalance             float64 `json:"loan_mortgage_balance,string"`
+	Mortgage                        float64 `json:"mortgage,string"`
 	Name                            string  `json:"name"`
 	Offline                         int     `json:"offline"`
 	Online                          int     `json:"online"`
 	PaymentTime                     string  `json:"payment_time"`
-	PointDepositBalance             float64 `json:"point_deposit_balance"`
+	PointDepositBalance             float64 `json:"point_deposit_balance,string"`
 	PoolAddress                     string  `json:"pool_address"`
-	PoolIncome                      float64 `json:"pool_income"`
+	PoolIncome                      float64 `json:"pool_income,string"`
 	PoolType                        string  `json:"pool_type"`
-	PreviousIncomePb                float64 `json:"previous_income_pb"`
-	TheoryMortgageBalance           float64 `json:"theory_mortgage_balance"`
+	PreviousIncomePb                float64 `json:"previous_income_pb,string"`
+	TheoryMortgageBalance           float64 `json:"theory_mortgage_balance,string"`
 	Type                            string  `json:"type"`
-	UndistributedIncome             float64 `json:"undistributed_income"`
+	UndistributedIncome             float64 `json:"undistributed_income,string"`
 }
 
 type PoolType int
@@ -86,11 +86,11 @@ func (w PoolType) String() string {
 	return [...]string{"opened", "all"}[w-1]
 }
 
-func (i *Hpool) PoolList(poolType PoolType) (poolList PoolList, err error) {
+func (i *Hpool) PoolList(poolType PoolType) (pools []Pool, err error) {
 	payload := map[string]string{
 		"type": poolType.String(),
 	}
-	r, err := i.client.do("GET", "pool/list?type=opened", payload, true)
+	r, err := i.client.do("GET", "pool/list", payload, true)
 	if err != nil {
 		return
 	}
@@ -105,11 +105,11 @@ func (i *Hpool) PoolList(poolType PoolType) (poolList PoolList, err error) {
 	if err = json.Unmarshal(response.Data, &data); err != nil {
 		return
 	}
-	err = json.Unmarshal(data.List, &poolList)
+	err = json.Unmarshal(data.List, &pools)
 	return
 }
 
-func (i *Hpool) PoolDetail(pool string) (poolList PoolList, err error) {
+func (i *Hpool) PoolDetail(pool string) (poolDetail Pool, err error) {
 	payload := map[string]string{
 		"type": pool,
 		"page": "1",
@@ -126,11 +126,7 @@ func (i *Hpool) PoolDetail(pool string) (poolList PoolList, err error) {
 	if err = handleErr(response); err != nil {
 		return
 	}
-	var data listData
-	if err = json.Unmarshal(response.Data, &data); err != nil {
-		return
-	}
-	err = json.Unmarshal(data.List, &poolList)
+	err = json.Unmarshal(response.Data, &poolDetail)
 	return
 }
 
