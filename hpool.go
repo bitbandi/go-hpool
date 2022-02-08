@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	API_BASE = "https://www.ihpool.com/api" // Hpool API endpoint
+	API_BASE = "https://www.hpool.in/api" // Hpool API endpoint
 )
 
 // New returns an instantiated hpool struct
